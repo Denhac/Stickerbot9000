@@ -1,0 +1,12 @@
+##################
+Booting Stickerbot
+##################
+
+1. Open cabinet.
+2. Switch power strip on.
+3. Power on printer.
+   #. Slide printer backwards to revile power button on top.
+   #. Power on printer.
+   #. Verify the "Status" light is lit.
+   #. Slide printer forwards into position. Verify printer engages return ramp.
+   
