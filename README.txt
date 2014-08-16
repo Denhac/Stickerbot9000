@@ -63,3 +63,10 @@ Upgrades:
   3. Improve security.
   4. Some kind of self-notifying damage system would be awesome. email? SMS?
   5. The ability to turn on and off the bill acceptor would be nice for interface improvement.
+  
+Thanks To:
+     Denhac - For being there and providing a space for hijinks.
+     Krav - Code
+     Eric - Code and making the printer work somehow.
+     YT   - Case!
+     Robb - Moar Case!
