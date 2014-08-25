@@ -70,3 +70,5 @@ Thanks To:
      Eric - Code and making the printer work somehow.
      YT   - Case!
      Robb - Moar Case!
+     Tek  - Awesome electronics help!
+     ChunkyStew - Moar Awesome electronics help.
