@@ -63,6 +63,8 @@ Upgrades:
   3. Improve security.
   4. Some kind of self-notifying damage system would be awesome. email? SMS?
   5. The ability to turn on and off the bill acceptor would be nice for interface improvement.
+  6. Fix buttons
+  7. Make multiple packs of stickers to run
   
 Thanks To:
      Denhac - For being there and providing a space for hijinks.
