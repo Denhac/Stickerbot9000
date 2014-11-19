@@ -80,7 +80,6 @@ class ScreenController:
 			if(id not in self.files):
 				self.files[id] = fileName
 
-	# I really hate this code.
 	# I realize it's nessesary, and the shortest way to do this, but it's still ugly and i hate it.
 	# Basically, it just grabs the next image ID, with corner case handling.  
 	def getNextID(self):
@@ -99,10 +98,27 @@ class ScreenController:
 				self.currentID = list(self.files.viewkeys())[0]
 		else:
 			self.currentID = 0
+
+	def getPreviousID(self):
+		ids = list(self.files.viewkeys())
+		if len(ids) != 0:
+			if self.currentID != 0:
+				if self.currentID in self.files:
+					location = ids.index(self.currentID)
+					if location == 0:
+						self.currentID = list(self.files.viewkeys())[len(ids)-1]
+					else:
+						self.currentID = list(self.files.viewkeys())[location-1]
+				else:
+					self.currentID = list(self.files.viewkeys())[0]
+			else:
+				self.currentID != list(self.files.viewkeys())[0]
+		else:
+			self.currentID = 0
 	
-	# This loop is called by run, but it checks the different kinds of intput for stickerbot.
-	# Currently the two buttons do the same exact thing, which is bad, but was a hack to get it running at defcon.
-	# The idea is that the buttons will both be used to allow stickerbot to be more interactive when it's all done.
+	# This loop is called by run, checks the different kinds of intput for stickerbot.
+	# Currently the two buttons do the same exact thing, which is bad.
+	# The idea is that the buttons will both be used to allow stickerbot to be more interactive.
 	def checkInput(self):
 		if(self.lcd.buttonPressed(self.lcd.RIGHT)):
 			print"User: "+str(self.currentID)+" is trying to print"
@@ -119,7 +135,8 @@ class ScreenController:
 			return True
 		return False
 
-	# this is the main loop of stickerbot. Running this method outside of a stickerbot object puts it in an indefinite loop.
+	# This is the main loop of stickerbot. 
+	# Running this method outside of a stickerbot object puts it in an indefinite loop.
 	def run(self):
 		writeLCD("Ready", Color.white)
 		self.checkFiles()
@@ -127,7 +144,7 @@ class ScreenController:
 			self.currentID = int(list(self.files.viewkeys())[0])
 		else:
 			self.currentID = 0
-		print "THE FIRST USER IS LUCKY NUMBER: "+str(self.currentID)
+		print "Pre-Loading: "+str(self.currentID)
 		self.writeLCD("Please Insert $1",Color.white)
 		while True:
 			if self.currentID != 0:
@@ -142,7 +159,8 @@ class ScreenController:
 				self.writeLCD("Image: "+self.currentID+"\nPlease Insert $1",Color.red)
 			self.checkFiles()
 
-#This code is currently useless, but was intended originally to make setting the screen color easier. Should probably be merged with code printing from the LCD.
+	#This code is currently useless, but was intended originally to make setting the screen color easier.
+	#Should probably be merged with code printing from the LCD.
 	def writeLCD(self, inputText, color):
 		if(color == Color.red):
 			self.lcd.backlight(self.lcd.RED)
@@ -158,11 +176,15 @@ class ScreenController:
 #If this is called instead of used as a class, we create an object and run it.
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser()
-	parser.add_argument("-t","--test",action="store_true", help="enables test mode. This will turn verbosity up and disable printing")
-	parser.add_argument("-v","--verbosity", type=int, choices=[0, 1, 2, 3], help="turns up verbosity of the code. Will output more information")
-	parser.add_argument("-s", "--stickerpack", type=str, help="Pre-chose the sticker pack, pre-empting the menu when it starts",
-	parser.add_argument("imageLocation", help="The directory which image files will be dropped into")	
+	parser.add_argument("-t","--test",action="store_true",
+				help="enables test mode. This will turn verbosity up and disable printing")
+	parser.add_argument("-v","--verbosity", 
+				type=int, choices=[0, 1, 2, 3], help="turns up verbosity of the code. Will output more information")
+	parser.add_argument("-s", "--stickerpack", 
+				type=str, help="Pre-chose the sticker pack, pre-empting the menu when it starts")
+	parser.add_argument("imageLocation", 
+				help="The directory which image files will be dropped into")	
 	parser.parse_args()
-	printStickers = StickerPrinter(args.imageLocation)
+	printStickers = ScreenController(args.imageLocation)
 	sleep(1)
 	printStickers.run()
