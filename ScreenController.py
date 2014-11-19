@@ -4,6 +4,7 @@
 from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 from time import sleep
 import cups
+import argparse
 from os import listdir, remove
 from os.path import isfile, join
 import RPi.GPIO as GPIO
@@ -16,7 +17,7 @@ class Color(Enum):
 	green = 3
 	white = 4
 
-class StickerPrinter:
+class ScreenController:
 
 	# Class Variables! YAY!
 	# should flesh these out more, possibly add some protection
@@ -32,9 +33,10 @@ class StickerPrinter:
 	def __init__(self, imageLocation):
 		self.imageLocation = imageLocation
 		self.lcd = Adafruit_CharLCDPlate()
-		self.writeLCD("Initializing\nStickerbot9001",Color.white)
+		self.writeLCD("Initializing",Color.white)
 		self.conn = cups.Connection()
 		self.printer = self.conn.getPrinters().keys()[0]
+		self.checkFiles()
 
 	# This originally handled all the code for getting a dollar, but was slowly reduced down and now it does literally fuck-all
 	# However, once we get the abiliy to control the bill acceptor, and make this much more robust,
@@ -154,16 +156,13 @@ class StickerPrinter:
 		self.lcd.message(inputText)
 
 #If this is called instead of used as a class, we create an object and run it.
-#This needs a ton of work with argparse and awesome stuff.
-	#suggestions
-	# 1. test flag
-	# 2. turn directory into an argument, not hardcoded (hardcoded bad)
-	# 3. choose stickerpack flag instead of prompting for stickerpack.
-	# 4. ??????
-	# 5. Profit.
 if __name__ == "__main__":
-	images = "/srv/http/images/"
-	printStickers = StickerPrinter(images)
-	printStickers.checkFiles()
-	sleep(3)
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-t","--test",action="store_true", help="enables test mode. This will turn verbosity up and disable printing")
+	parser.add_argument("-v","--verbosity", type=int, choices=[0, 1, 2, 3], help="turns up verbosity of the code. Will output more information")
+	parser.add_argument("-s", "--stickerpack", type=str, help="Pre-chose the sticker pack, pre-empting the menu when it starts",
+	parser.add_argument("imageLocation", help="The directory which image files will be dropped into")	
+	parser.parse_args()
+	printStickers = StickerPrinter(args.imageLocation)
+	sleep(1)
 	printStickers.run()
