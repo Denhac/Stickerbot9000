@@ -11,9 +11,9 @@ from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 from time import sleep
 import cups
 from os import listdir, remove
-from os.path import isfile, join
 import RPi.GPIO as GPIO
 import sys
+
 
 class stickerPrinter:
 
@@ -32,22 +32,16 @@ class stickerPrinter:
         self.lcd.message("Initializing\nStickerBOT9000")
         self.conn = cups.Connection()
         self.printer = self.conn.getPrinters().keys()[0]
-        self.buttonPin=4
+        self.buttonPin = 4
         print "Turning on GPIO"
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.buttonPin,GPIO.IN,pull_up_down=GPIO.PUD_DOWN)
+        GPIO.setup(self.buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(4, GPIO.RISING, bouncetime=3000)
         self.checkFiles()
 
-    def updateScreen(self, text):
-        print "Updating Screen: %s" + text
-        self.lcd.clear()
-        self.lcd.message("Image: "+str(self.currentID)+"\n"+text)
-
     def printFile(self):
         print "Starting to print a sticker"
-        self.updateScreen("Now Printing")
-        self.lcd.backlight(self.lcd.RED)
+        self.updateScreen("Now Printing", "RED")
         image = self.imageLocation+self.files[self.currentID]
         print "Printing: "+image
         print "Contacting CUPS, the printer daemon"
@@ -55,7 +49,7 @@ class stickerPrinter:
         print "Waiting for the print job to complete."
         while(self.conn.getJobs().get(printid, None) is not None):
             pass
-        self.updateScreen("\nPrinted. Thanks!")
+        self.updateScreen("\nPrinted. Thanks!", "GREEN")
         self.lcd.backlight(self.lcd.GREEN)
         sleep(3)
         print "Checking if the image is a one-time sticker"
@@ -131,31 +125,39 @@ class stickerPrinter:
 
     def run(self):
         print ("Ready to go")
-        self.lcd.clear()
-        self.lcd.message("Ready")
-        self.checkFiles()
+        self.updateScreen("Ready", "WHITE")
         if len(list(self.files.viewkeys())) != 0:
             self.currentID = int(list(self.files.viewkeys())[0])
         else:
             self.currentID = 0
         print "Starting with Sticker : "+str(self.currentID)
-        self.updateScreen("Please Insert $1")
+        self.updateScreen("Please Insert $1", "BLUE")
         while True:
             if self.currentID != 0:
                 if (self.checkInput()):
-                    self.updateScreen("Please Insert $1")
+                    self.updateScreen("Please Insert $1", "BLUE")
             else:
-                self.lcd.clear()
-                self.lcd.message("Ready")
+                self.updateScreen("Ready", "WHITE")
                 while len(list(self.files.viewkeys())) == 0:
                     sleep(.5)
                     self.checkFiles()
                 self.getNextID()
-                self.updateScreen("Please Insert $1")   
+                self.updateScreen("Please Insert $1", "BLUE")
+
             self.lcd.backlight(self.lcd.ON)
             self.checkFiles()
 
-    def colorScreen(self, color):
+    # updateScreen - A simple method to ease changing of the screen.
+    #   text  - Text to update the screen to.
+    #   color - The color to change the screen. In this case you choose between RED, GREEN, BLUE, and WHITE.
+
+    def updateScreen(self, text, color):
+        print "Updating Screen: %s" + text
+        self.lcd.clear()
+        self.lcd.message("Image: "+str(self.currentID)+"\n"+text)
+        if(color == "BLUE"):
+            print "Changing the color of my screen to blue"
+            self.lcd.backlight(self.lcd.BLUE)
         if(color == "RED"):
             print "changing the color of my screen to red"
             self.lcd.backlight(self.lcd.RED)
@@ -166,13 +168,20 @@ class stickerPrinter:
             print "changing the color of my screen to white"
             self.lcd.backlight(self.lcd.WHITE)
 
+# main method. for doing main method things.
 
 if __name__ == "__main__":
     if(len(sys.argv) < 2):
         print("\tUsage: %s imageDirectory" % sys.argv[0])
         exit(0)
+    # Print out a bit of info about stickerbot
     print "----------- Hello! I'm --------------"
-    print "STICKERBOT 9000"
+    print"   _____ _______ _____ _____ _  ________ _____  ____   ____ _______    ___   ___   ___   ___  "
+    print"  / ____|__   __|_   _/ ____| |/ /  ____|  __ \|  _ \ / __ \__   __|  / _ \ / _ \ / _ \ / _ \ "
+    print" | (___    | |    | || |    | ' /| |__  | |__) | |_) | |  | | | |    | (_) | | | | | | | | | |"
+    print"  \___ \   | |    | || |    |  < |  __| |  _  /|  _ <| |  | | | |     \__, | | | | | | | | | |"
+    print"  ____) |  | |   _| || |____| . \| |____| | \ \| |_) | |__| | | |       / /| |_| | |_| | |_| |"
+    print" |_____/   |_|  |_____\_____|_|\_\______|_|  \_\____/ \____/  |_|      /_/  \___/ \___/ \___/ "
     print ""
     print "I was designed by members of denhac (the booth you're at right now) as a donation box"
     print "for DEFCON 22. DEFCON is one of the biggest, if not the biggest security convention in"
