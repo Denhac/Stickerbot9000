@@ -17,13 +17,19 @@ import sys
 
 class stickerPrinter:
 
+    # Local Variables! Yay!
+
     imageLocation = ""
     files = {}
     currentID = ""
+    currentSticker = ""
     lcd = None
     conn = None
     printer = None
     waiting_for_input = 0
+
+    # Init
+    #   This shouldn't need an explanation
 
     def __init__(self, imageLocation):
         print "Setting defaults and initializing software"
@@ -37,6 +43,8 @@ class stickerPrinter:
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.buttonPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
         GPIO.add_event_detect(4, GPIO.RISING, bouncetime=3000)
+        BLACK = self.lcd.LEFT
+        RED = self.lcd.RIGHT
         self.checkFiles()
 
     def printFile(self):
@@ -71,7 +79,7 @@ class stickerPrinter:
             if(id not in self.files):
                 self.files[id] = fileName
 
-    def getNextID(self):
+    def getNextSticker(self):
         ids = list(self.files.viewkeys())
         if len(ids) != 0:
             if self.currentID != 0:
@@ -89,24 +97,6 @@ class stickerPrinter:
             self.currentID = 0
         print "Switching up to image"
 
-    def getPrevID(self):
-        ids = list(self.files.viewkeys())
-        if len(ids) != 0:
-            if self.currentID != 0:
-                if self.currentID in self.files:
-                    location = ids.index(self.currentID)
-                    if location == 0:
-                        self.currentID = list(self.files.viewkeys())[len(ids)-1]
-                    else:
-                        self.currentID = list(self.files.viewkeys())[location-1]
-                else:
-                    self.currentID = list(self.files.viewkeys())[0]
-            else:
-                self.currentID != list(self.files.viewkeys())[0]
-        else:
-            self.currentID = 0
-        print "Switching down to image"
-
     def checkInput(self):
         if(self.lcd.buttonPressed(self.lcd.RIGHT)):
             print "User: "+str(self.currentID)+" is trying to print"
@@ -123,9 +113,20 @@ class stickerPrinter:
             return True
         return False
 
+    # run - This is the main method that runs everything.
+    #   This requires nothing because it's just a loop
+
     def run(self):
         print ("Ready to go")
-        self.updateScreen("Ready", "WHITE")
+        self.updateScreen("Ready to Print.\n Press a button!", "WHITE")
+        while( not self.lcd.buttonPressed(self.BLACK) && not self.lcd.buttonPressed(self.RED) ):
+            sleep(.5)
+        self.lcd.buttonPressed(self.BLACK)
+        self.lcd.buttonPressed(self.RED)
+        while( not self.lcd.buttonPressed(self.BLACK)
+            self.updateScreen("Sticker: %s\n RED=Change BLK=Confirm"%currentSticker)
+            if(self.lcd.buttonPressed(self.RED)):
+                getNextSticker()
         if len(list(self.files.viewkeys())) != 0:
             self.currentID = int(list(self.files.viewkeys())[0])
         else:
